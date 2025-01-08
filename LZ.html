@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lékařské Zprávy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        h1, h2, h3 {
+            color: #004d80;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #004d80;
+            border-radius: 5px;
+            background-color: #e6f7ff;
+            color: #004d80;
+        }
+        button:hover {
+            background-color: #b3e0ff;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #004d80;
+            border-radius: 5px;
+            background: #ffffff;
+            text-align: left;
+            color: #004d80;
+            font-size: 18px;
+        }
+        .section {
+            margin-top: 20px;
+        }
+        .big-button {
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: #004d80;
+            color: white;
+            border: 2px solid #004d80;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .big-button:hover {
+            background-color: #003366;
+        }
+        .lifepack-section {
+            display: none;
+            margin-top: 40px;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .lifepack-section.show {
+            display: block;
+            opacity: 1;
+        }
+        #output-container {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="icon">
+        <img src="https://ems.kojban.cz/wp-content/uploads/2019/05/icon_temp-150x150.png" alt="EMS_icon">
+    </div>
+    
+    <h1>Lékařská Zpráva</h1>
+    <h2>Základní vyšetření:</h2>
+
+    <div class="section">
+        <p>Vyberte stav vědomí:</p>
+        <button onclick="addVedomi('BEZV.')">Bez vědomí</button>
+        <button onclick="addVedomi('PV.')">Při vědomí</button>
+    </div>
+
+    <div class="section">
+        <p>Vyberte zornice:</p>
+        <button onclick="addZornice('izo,')">Izo</button>
+        <button onclick="addZornice('anizo,')">Anizo</button>
+    </div>
+
+    <div class="section">
+        <p>Vyberte stav břicha:</p>
+        <button onclick="addBricho('měkké,')">Měkké</button>
+        <button onclick="addBricho('tvrdé,')">Tvrdé</button>
+    </div>
+
+    <div class="section">
+        <p>Vyberte stav Pravé horní končetiny:</p>
+        <button onclick="addRhkk('BPN,')">Bez patologického nálezu</button>
+        <button onclick="addRhkk('PN,')">Patologický nález</button>
+    </div>
+
+    <div class="section">
+        <p>Vyberte stav Levé horní končetiny:</p>
+        <button onclick="addLhkk('BPN,')">Bez patologického nálezu</button>
+        <button onclick="addLhkk('PN,')">Patologický nález</button>
+    </div>
+
+    <div class="section">
+        <button class="big-button" onclick="showLifePack()">Pokračovat na LifePack</button>
+    </div>
+
+    <!-- Sekce LifePack -->
+    <div class="lifepack-section" id="lifepack-section">
+        <h2>LifePack</h2>
+
+        <h3>LifePack hodnoty:</h3>
+        <div class="section">
+            <p>Tep (TF):</p>
+            <button onclick="updateLifePack('TF', '0,')">0</button>
+            <button onclick="updateLifePack('TF', 'nízký,')">Nízký</button>
+            <button onclick="updateLifePack('TF', 'normální,')">Normální</button>
+            <button onclick="updateLifePack('TF', 'vysoký,')">Vysoký</button>
+        </div>
+
+        <div class="section">
+            <p>Tlak (TK):</p>
+            <button onclick="updateLifePack('TK', '0,')">0</button>
+            <button onclick="updateLifePack('TK', 'nízký,')">Nízký</button>
+            <button onclick="updateLifePack('TK', 'normální,')">Normální</button>
+            <button onclick="updateLifePack('TK', 'vysoký,')">Vysoký</button>
+        </div>
+
+        <div class="section">
+            <p>Saturace (Sat):</p>
+            <button onclick="updateLifePack('Sat', '0,')">0</button>
+            <button onclick="updateLifePack('Sat', 'nízká,')">Nízká</button>
+            <button onclick="updateLifePack('Sat', 'normální,')">Normální</button>
+            <button onclick="updateLifePack('Sat', 'vysoká,')">Vysoká</button>
+        </div>
+        <div class="section">
+            <p>Teplota (TT):</p>
+            <button onclick="updateLifePack('TT', 'Hypotermická.')">Hypotermie</button>
+            <button onclick="updateLifePack('TT', 'Afebrilní.')">Afebrilní</button>
+            <button onclick="updateLifePack('TT', 'Febrilní.')">Febrilní</button>
+            <button onclick="updateLifePack('TT', 'Subfebrilní.')">Subfebrilní</button>
+            <button onclick="updateLifePack('TT', 'Hyperpyrexická.')">Hyperpyrexie</button>
+        </div>
+    </div>
+
+    <!-- Původní záznam a tlačítka pro kopírování a mazání -->
+    <div id="output-container">
+        <h2>Lékařská Zpráva:</h2>
+        <div id="output">Při příjezdu pacient, byl</div>
+        <button onclick="copyLog()">Zkopírovat zprávu</button>
+        <button onclick="clearLog()">Smazat záznam</button>
+    </div>
+
+    <script>
+        let log = "Při příjezdu pacient, byl";
+        let addedSections = { vedomi: false, zornice: false, bricho: false, Rhkk: false, Lhkk: false };
+        let lifepackValues = { TF: null, TK: null, Sat: null, TT: null };
+
+        function addVedomi(state) {
+            if (!addedSections.vedomi) {
+                log += ` ${state}`;
+                addedSections.vedomi = true;
+            } else {
+                log = log.replace(/(BEZV\.|PV\.)/, state);
+            }
+            updateLog();
+        }
+
+        function addZornice(state) {
+            if (!addedSections.vedomi) {
+                alert('Nejdřív vyberte stav vědomí!');
+                return;
+            }
+            if (!addedSections.zornice) {
+                log += ` ZO ${state}`;
+                addedSections.zornice = true;
+            } else {
+                log = log.replace(/ZO (izo\,|anizo\,)/, `ZO ${state}`);
+            }
+            updateLog();
+        }
+
+        function addBricho(state) {
+            if (!addedSections.vedomi) {
+                alert('Nejdřív vyberte stav vědomí!');
+                return;
+            }
+            if (!addedSections.zornice) {
+                alert('Nejdřív vyberte stav zornic!');
+                return;
+            }
+            if (!addedSections.bricho) {
+                log += ` BP ${state}`;
+                addedSections.bricho = true;
+            } else {
+                log = log.replace(/BP (měkké\,|tvrdé\,)/, `BP ${state}`);
+            }
+            updateLog();
+        }
+
+        function addRhkk(state) {
+            if (!addedSections.vedomi) {
+                alert('Nejdřív vyberte stav vědomí!');
+                return;
+            }
+            if (!addedSections.zornice) {
+                alert('Nejdřív vyberte stav zornic!');
+                return;
+            }
+            if (!addedSections.bricho) {
+                alert('Nejdřív vyberte stav břicha!');
+                return;
+            }
+            if (!addedSections.Rhkk) {
+                log += ` RHKK ${state}`;
+                addedSections.Rhkk = true;
+            } else {
+                log = log.replace(/RHKK (BPN\,|PN\,)/, `RHKK ${state}`);
+            }
+            updateLog();
+        }
+
+        function addLhkk(state) {
+            if (!addedSections.vedomi) {
+                alert('Nejdřív vyberte stav vědomí!');
+                return;
+            }
+            if (!addedSections.zornice) {
+                alert('Nejdřív vyberte stav zornic!');
+                return;
+            }
+            if (!addedSections.bricho) {
+                alert('Nejdřív vyberte stav břicha!');
+                return;
+            }
+            if (!addedSections.Rhkk) {
+                alert('Nejdřív vyberte stav Pravé ruky!');
+                return;
+            }
+            if (!addedSections.Lhkk) {
+                log += ` LHKK ${state}`;
+                addedSections.Lhkk = true;
+            } else {
+                log = log.replace(/LHKK (BPN\,|PN\,)/, `LHKK ${state}`);
+            }
+            updateLog();
+        }
+
+        function updateLifePack(parameter, value) {
+            lifepackValues[parameter] = value;
+
+            log = log.replace(/LP hodnoty byly.*$/, ""); // Odstranění starých hodnot LifePack
+            const lpValues = formatLifePackValues();
+            if (lpValues) {
+                log += ` LP hodnoty byly ${lpValues}`;
+            }
+            updateLog();
+        }
+
+        function formatLifePackValues() {
+            const tf = lifepackValues.TF ? ` TF ${lifepackValues.TF}` : "";
+            const tk = lifepackValues.TK ? ` TK ${lifepackValues.TK}` : "";
+            const sat = lifepackValues.Sat ? ` Sat ${lifepackValues.Sat}` : "";
+            const tt = lifepackValues.TT ? ` TT ${lifepackValues.TT}` : "";
+            return `${tf}${tk}${sat}${tt}`.trim();
+        }
+
+        function updateLog() {
+            document.getElementById('output').innerText = log.trim();
+        }
+
+        function clearLog() {
+            location.reload(); // Obnoví stránku (stejné jako F5)
+        }
+
+        function copyLog() {
+            navigator.clipboard.writeText(log).then(() => {
+                alert('Záznam byl zkopírován!');
+            }).catch(err => {
+                alert('Kopírování selhalo: ' + err);
+            });
+        }
+
+        function showLifePack() {
+            if (!addedSections.vedomi || !addedSections.zornice || !addedSections.bricho) {
+                alert('Vyplňte základní vyšetření před pokračováním!');
+                return;
+            }
+
+            document.getElementById('lifepack-section').classList.add('show');
+        }
+    </script>
+</body>
+</html>
